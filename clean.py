@@ -186,10 +186,26 @@ def deep_folders(adress: str) -> None:
         way = os.path.join(adress, el)
         if os.path.isdir(way):
             files_in_way = os.listdir(way)
-            for file in files_in_way:                
-                if os.path.exists(os.path.join(adress, file)): 
-                    continue
-                shutil.move(os.path.join(way, file), adress)
+            for file in files_in_way:               
+                shutil.move(os.path.join(way, file), adress)                
+                del_empty_dirs(adress)
+            if not os.path.isdir(adress):
+                break
+            else:
+                deep_folders(adress)
+
+def deep_folders2(adress: str) -> None:
+    for el in os.listdir(adress):
+        way = os.path.join(adress, el)
+        if os.path.isdir(way):
+            files_in_way = os.listdir(way)
+            if len(files_in_way) == 1 and os.path.isdir(os.path.join(way, files_in_way[0])):
+                deep_folders(way)  # Call deep_folders recursively on the inner directory
+            else:
+                for file in files_in_way:                
+                    if os.path.exists(os.path.join(adress, file)): 
+                        continue
+                    shutil.move(os.path.join(way, file), adress)
                 
                 del_empty_dirs(adress)
             if not os.path.isdir(adress):
@@ -252,7 +268,8 @@ def resume_with_arch(*args, adress: str) -> str:
 
 if __name__ == '__main__':
     try:
-        adress = sys.argv[1]
+        # adress = sys.argv[1]
+        adress = 'C:\hlam'
         deep_folders(adress)
         rename_and_transfer(adress)
         result_sorting_with_arch(adress)
