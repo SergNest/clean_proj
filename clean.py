@@ -23,6 +23,8 @@ for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
 resume = ''
 
 def normalize(adress: str, filename: str) -> None:
+    # if '.' not in filename:
+    #     return
     find_kyrill = [x for x in CYRILLIC_SYMBOLS if x in filename.lower()]
     name_cln = ""
     if len(find_kyrill) > 0:
@@ -268,8 +270,7 @@ def resume_with_arch(*args, adress: str) -> str:
 
 if __name__ == '__main__':
     try:
-        # adress = sys.argv[1]
-        adress = 'C:\hlam'
+        adress = sys.argv[1]
         deep_folders(adress)
         rename_and_transfer(adress)
         result_sorting_with_arch(adress)
