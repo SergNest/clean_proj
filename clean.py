@@ -185,12 +185,14 @@ def dont_know_files(adress: str) -> list:
 
 def deep_folders(adress: str) -> None:
     for el in os.listdir(adress):
+       
         way = os.path.join(adress, el)
         if os.path.isdir(way):
             files_in_way = os.listdir(way)
-            for file in files_in_way:               
-                shutil.move(os.path.join(way, file), adress)                
-                del_empty_dirs(adress)
+            del_empty_dirs(adress)
+            for file in files_in_way :               
+                    shutil.move(os.path.join(way, file), adress + '/1' if el == file else  adress)                
+                    del_empty_dirs(adress)
             if not os.path.isdir(adress):
                 break
             else:
@@ -271,6 +273,7 @@ def resume_with_arch(*args, adress: str) -> str:
 if __name__ == '__main__':
     try:
         adress = sys.argv[1]
+        # adress = 'C:/test'
         deep_folders(adress)
         rename_and_transfer(adress)
         result_sorting_with_arch(adress)
