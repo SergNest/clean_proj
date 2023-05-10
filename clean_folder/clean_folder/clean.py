@@ -269,8 +269,7 @@ def resume_with_arch(*args, adress: str) -> str:
     resume += arch_part_of_resume
     return resume
 
-
-if __name__ == '__main__':
+def run():
     try:
         adress = sys.argv[1]
         # adress = 'C:/test'
@@ -280,4 +279,7 @@ if __name__ == '__main__':
     except IndexError as inst:
             print('Потрібно передати папку сортування')
     except Exception as inst:
-            print(inst)    
+            print(inst)  
+
+if __name__ == '__main__':
+     run() 
