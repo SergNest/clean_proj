@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+import concurrent.futures
 
 IMAGES = ('JPEG', 'PNG', 'JPG', 'SVG')
 VIDEO = ('AVI', 'MP4', 'MOV', 'MKV')
@@ -198,25 +199,6 @@ def deep_folders(adress: str) -> None:
             else:
                 deep_folders(adress)
 
-def deep_folders2(adress: str) -> None:
-    for el in os.listdir(adress):
-        way = os.path.join(adress, el)
-        if os.path.isdir(way):
-            files_in_way = os.listdir(way)
-            if len(files_in_way) == 1 and os.path.isdir(os.path.join(way, files_in_way[0])):
-                deep_folders(way)  # Call deep_folders recursively on the inner directory
-            else:
-                for file in files_in_way:                
-                    if os.path.exists(os.path.join(adress, file)): 
-                        continue
-                    shutil.move(os.path.join(way, file), adress)
-                
-                del_empty_dirs(adress)
-            if not os.path.isdir(adress):
-                break
-            else:
-                deep_folders(adress)
-
 def rename_and_transfer(adress: str) -> None:
     no_type = dont_know_files(adress)
     files = os.listdir(adress)
@@ -269,12 +251,25 @@ def resume_with_arch(*args, adress: str) -> str:
     resume += arch_part_of_resume
     return resume
 
+def process_folder(path):
+    normalize(path)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for folder_name, finder in [("dlls", find_dlls), ("images", find_images), ("music", find_music),
+                                    ("video", find_video), ("documents", find_docs), ("archives", find_archives)]:
+            files = finder(path)
+            if files:
+                futures.append(executor.submit(transfer_files, path, folder_name, files))
+        concurrent.futures.wait(futures)
+
+
 def run():
     try:
         adress = sys.argv[1]
         # adress = 'C:/test'
         deep_folders(adress)
-        rename_and_transfer(adress)
+        process_folder(adress)
+        # rename_and_transfer(adress)
         result_sorting_with_arch(adress)
     except IndexError as inst:
             print('Потрібно передати папку сортування')
